@@ -1,7 +1,10 @@
+import datetime
+
 import flask
 from data import db_session
 from data.users import User
 from data.news import News
+from data.mars_explorer.jobs import Jobs
 from flask import render_template, url_for, redirect, request
 from forms.user import RegisterForm
 
@@ -11,36 +14,15 @@ app.config["SECRET_KEY"] = 'yandexlyceum_secret_key'
 
 def main():
     db_session.global_init("db/mars_explorer.db")
-    captain = User()
-    captain.surname = "Scott"
-    captain.name = "Ridley"
-    captain.age = 21
-    captain.position = "captain"
-    captain.speciality = "research engineer"
-    captain.address = "module_1"
-    captain.email = "scott_chief@mars.org"
     dbs = db_session.create_session()
-    dbs.add(captain)
-    dbs.commit()
-    c1 = User()
-    c1.surname = "Watney"
-    c1.name = "Mark"
-    c1.age = 25
-    c1.email = "mwatney_99@mars.org"
-    c1.address = "module_2"
-    c1.speciality = "mechanical engineer"
-    c2 = User()
-    c2.surname = "Sanders"
-    c2.name = "Teddy"
-    c2.age = 32
-    c3 = User()
-    c3.surname = "Weir"
-    c3.name = "Andy"
-    c3.age = 23
-    c3.speciality = "astrogeologist"
-    dbs.add(c1)
-    dbs.add(c2)
-    dbs.add(c3)
+    mod_const = Jobs()
+    mod_const.team_leader = 1
+    mod_const.job = "deployment of residential modules 1 and 2"
+    mod_const.work_size = 15
+    mod_const.collaborators = "2, 3"
+    mod_const.start_date = datetime.datetime.now()
+    mod_const.is_finished = False
+    dbs.add(mod_const)
     dbs.commit()
     app.run()
 
