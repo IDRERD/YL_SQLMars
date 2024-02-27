@@ -1,0 +1,30 @@
+{%extends "base.html"%}
+{%block content%}
+<link rel="stylesheet" type="text/css" href="../static/css/jobs.css">
+<h1 style="text-align: center;">Works log</h1>
+{%for job in jobs%}
+<h2>Action #{{loop.index}}</h2>
+<table style="width: 90%;">
+	<tr>
+		<th style="width: 40%;">Title activity</th>
+		<th>Team leader</th>
+		<th>Duration</th>
+		<th>List of collaborators</th>
+		<th>Is finished</th>
+	</tr>
+	<tr style="height: 48pt;">
+		<td>{{job.job.capitalize()}}</td>
+		<td>{{colonists[job.team_leader - 1].surname}} {{colonists[job.team_leader - 1].name}}</td>
+		<td>{{job.work_size}} hours</td>
+		<td>{{job.collaborators}}</td>
+		<td>
+			{%if job.is_finished%}
+			Is finished
+			{%else%}
+			Is not finished
+			{%endif%}
+		</td>
+	</tr>
+</table>
+{%endfor%}
+{%endblock%}

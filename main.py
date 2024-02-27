@@ -14,16 +14,6 @@ app.config["SECRET_KEY"] = 'yandexlyceum_secret_key'
 
 def main():
     db_session.global_init("db/mars_explorer.db")
-    dbs = db_session.create_session()
-    mod_const = Jobs()
-    mod_const.team_leader = 1
-    mod_const.job = "deployment of residential modules 1 and 2"
-    mod_const.work_size = 15
-    mod_const.collaborators = "2, 3"
-    mod_const.start_date = datetime.datetime.now()
-    mod_const.is_finished = False
-    dbs.add(mod_const)
-    dbs.commit()
     app.run()
 
 
@@ -60,6 +50,13 @@ def reqister():
         return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form)
 
+
+@app.route("/jobs")
+def jobs():
+    dbs = db_session.create_session()
+    jbs = dbs.query(Jobs).all()
+    cls = dbs.query(User).all()
+    return render_template("jobs.html", title="Works log", jobs=jbs, colonists=cls)
 
 
 if __name__ == "__main__":
