@@ -41,7 +41,7 @@ def create_news():
     return flask.jsonify({'id': news.id})
 
 
-@blueprint.route("api/news/<int:news_id>", methods=["DELETE"])
+@blueprint.route("/api/news/<int:news_id>", methods=["DELETE"])
 def delete_news(news_id):
     dbs = db_session.create_session()
     news = dbs.query(News).get(news_id)

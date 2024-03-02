@@ -7,7 +7,7 @@ import flask
 from data import db_session, news_api
 from data.users import User
 from data.news import News
-from data.mars_explorer.jobs import Jobs
+from data.jobs import Jobs
 from flask import render_template, url_for, redirect, request, make_response, abort
 from forms.user import RegisterForm
 from flask import session
@@ -21,7 +21,7 @@ login_manager.init_app(app)
 
 
 def main():
-    db_session.global_init("db/blogs.db")
+    db_session.global_init("db/mars.db")
     app.register_blueprint(news_api.blueprint)
     app.run()
 
@@ -30,13 +30,15 @@ def main():
 @app.route("/index")
 def index():
     db_sess = db_session.create_session()
-    news = db_sess.query(News).filter(News.is_private != True)
+    jobs = db_sess.query(Jobs).all()
+    if not jobs or not len(jobs):
+        return "Jobs not found"
     #if current_user.is_authenticated:
     #    news = db_sess.query(News).filter(
     #        (News.user == current_user) | (News.is_private != True))
     #else:
     #    news = db_sess.query(News).filter(News.is_private != True)
-    return render_template("index.html", news=news)
+    return render_template("index.html", jobs=jobs)
 
 
 @app.route('/register', methods=['GET', 'POST'])
