@@ -4,7 +4,7 @@ from data.login import LoginForm
 from data.news_form import NewsForm
 
 import flask
-from data import db_session
+from data import db_session, news_api
 from data.users import User
 from data.news import News
 from data.mars_explorer.jobs import Jobs
@@ -22,6 +22,7 @@ login_manager.init_app(app)
 
 def main():
     db_session.global_init("db/blogs.db")
+    app.register_blueprint(news_api.blueprint)
     app.run()
 
 
@@ -183,6 +184,16 @@ def news_delete(id):
     else:
         abort(404)
     return redirect('/')
+
+
+@app.errorhandler(404)
+def not_found(error):
+    return make_response(flask.jsonify({"error": "Not found"}), 404)
+
+
+@app.errorhandler(400)
+def bad_request(_):
+    return make_response(flask.jsonify({"error": "Bad request"}), 400)
 
 
 if __name__ == "__main__":
