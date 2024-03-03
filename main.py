@@ -162,7 +162,7 @@ def add_job():
         dbs.add(job)
         dbs.commit()
         return redirect("/")
-    return render_template("add_job.html", title="Добавление работы", form=form)
+    return render_template("add_job.html", title="Добавление работы", form=form, can_delete=False)
 
 
 @app.route('/news/<int:id>', methods=['GET', 'POST'])
@@ -228,7 +228,7 @@ def edit_job(job_id):
             job.end_date = form.end_date.data
         else:
             abort(404)
-    return render_template("add_job.html", title="Редактирование работы", form=form)
+    return render_template("add_job.html", title="Редактирование работы", form=form, can_delete=True, job=job)
 
 
 @app.route('/news_delete/<int:id>', methods=['GET', 'POST'])

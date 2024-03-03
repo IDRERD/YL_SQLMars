@@ -49,6 +49,9 @@
 	</p>
 	<p>{{form.is_finished()}} {{form.is_finished.label}}</p>
 	<p>{{form.submit(type="submit", class="btn btn-primary")}}</p>
+	{%if can_delete%}
+	<a class="btn btn-danger" href="/delete_job/{{job.id}}">Удалить работу</a>
+	{%endif%}
 	{{message}}
 </form>
 {%endblock%}
