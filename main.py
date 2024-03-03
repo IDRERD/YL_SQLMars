@@ -30,8 +30,8 @@ def index():
     dbs = db_session.create_session()
     jobs = dbs.query(Jobs).all()
     team_leaders = [dbs.query(User).get(job.team_leader) for job in jobs]
-    if not jobs or not len(jobs):
-        return "Jobs not found"
+    # if not jobs or not len(jobs):
+    #     return "Jobs not found"
     #if current_user.is_authenticated:
     #    news = db_sess.query(News).filter(
     #        (News.user == current_user) | (News.is_private != True))
@@ -69,12 +69,12 @@ def register():
     return render_template('register.html', title='Регистрация', form=form)
 
 
-@app.route("/jobs")
-def jobs():
-    dbs = db_session.create_session()
-    jbs = dbs.query(Jobs).all()
-    cls = dbs.query(User).all()
-    return render_template("jobs.html", title="Works log", jobs=jbs, colonists=cls)
+# @app.route("/jobs")
+# def jobs():
+#     dbs = db_session.create_session()
+#     jbs = dbs.query(Jobs).all()
+#     cls = dbs.query(User).all()
+#     return render_template("jobs.html", title="Works log", jobs=jbs, colonists=cls)
 
 
 @app.route("/cookie_test")
@@ -111,6 +111,7 @@ def login():
         user = dbs.query(User).filter(User.email.is_(form.email.data)).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember.data)
+            current_user.id = user.id
             return redirect("/")
         else:
             return render_template("login.html", message="Login or email is not valid", form=form)
@@ -121,6 +122,7 @@ def login():
 @login_required
 def logout():
     logout_user()
+    current_user.id = -1
     return redirect("/")
 
 
@@ -142,7 +144,7 @@ def add_news():
                            form=form)
 
 
-@app.route("/add_job", methods=["POST", "GET"])
+@app.route("/jobs", methods=["POST", "GET"])
 @login_required
 def add_job():
     form = JobForm()
@@ -154,8 +156,9 @@ def add_job():
         job.work_size = form.work_size.data
         job.collaborators = form.collaborators.data
         job.is_finished = form.is_finished.data
-        # job.start_date = form.start_date.data
-        # job.end_date = form.end_date.data
+        job.start_date = form.start_date.data
+        job.end_date = form.end_date.data
+        job.creator = current_user.id
         dbs.add(job)
         dbs.commit()
         return redirect("/")
@@ -194,6 +197,38 @@ def edit_news(id):
                            title='Редактирование новости',
                            form=form
                            )
+
+
+@app.route("/jobs/<int:job_id>", methods=["POST", "GET"])
+def edit_job(job_id):
+    form = JobForm()
+    if request.method == "GET":
+        dbs = db_session.create_session()
+        job = dbs.query(Jobs).filter(Jobs.id == job_id).first()
+        if job and (job.creator == current_user.id or current_user.id == 1):
+            form.job.data = job.job
+            form.team_leader.data = job.team_leader
+            form.work_size.data = job.work_size
+            form.collaborators.data = job.collaborators
+            form.is_finished.data = job.is_finished
+            form.start_date.data = job.start_date
+            form.end_date.data = job.end_date
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        dbs = db_session.create_session()
+        job = dbs.query(Jobs).filter(Jobs.id == job_id).first()
+        if job and (job.creator == current_user.id or current_user.id == 1):
+            job.job = form.job.data
+            job.team_leader = form.team_leader.data
+            job.work_size = form.work_size.data
+            job.collaborators = form.collaborators.data
+            job.is_finished = form.is_finished.data
+            job.start_date = form.start_date.data
+            job.end_date = form.end_date.data
+        else:
+            abort(404)
+    return render_template("add_job.html", title="Редактирование работы", form=form)
 
 
 @app.route('/news_delete/<int:id>', methods=['GET', 'POST'])
