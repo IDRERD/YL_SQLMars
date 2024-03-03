@@ -1,16 +1,13 @@
 import datetime
-
 from data.login import LoginForm
 from data.news_form import NewsForm
-
 import flask
-from data import db_session, news_api
+from data import db_session
 from data.users import User
-from data.news import News
 from data.jobs import Jobs
-from flask import render_template, url_for, redirect, request, make_response, abort
+#from data.news import News
+from flask import render_template, url_for, redirect, request, make_response, abort, session
 from forms.user import RegisterForm
-from flask import session
 from flask_login import LoginManager, login_required, logout_user, login_user, current_user
 
 app = flask.Flask(__name__)
@@ -22,15 +19,16 @@ login_manager.init_app(app)
 
 def main():
     db_session.global_init("db/mars.db")
-    app.register_blueprint(news_api.blueprint)
+    # app.register_blueprint(news_api.blueprint)
     app.run()
 
 
 @app.route("/")
 @app.route("/index")
 def index():
-    db_sess = db_session.create_session()
-    jobs = db_sess.query(Jobs).all()
+    dbs = db_session.create_session()
+    jobs = dbs.query(Jobs).all()
+    team_leaders = dbs.query(User).filter(User.id.in_([job.team_leader for job in dbs.query(Jobs).all()]))
     if not jobs or not len(jobs):
         return "Jobs not found"
     #if current_user.is_authenticated:
@@ -38,11 +36,11 @@ def index():
     #        (News.user == current_user) | (News.is_private != True))
     #else:
     #    news = db_sess.query(News).filter(News.is_private != True)
-    return render_template("index.html", jobs=jobs)
+    return render_template("index.html", jobs=jobs, team_leaders=team_leaders)
 
 
 @app.route('/register', methods=['GET', 'POST'])
-def reqister():
+def register():
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
@@ -57,7 +55,11 @@ def reqister():
         user = User(
             name=form.name.data,
             email=form.email.data,
-            about=form.about.data
+            surname=form.surname.data,
+            age=form.age.data,
+            position=form.position.data,
+            speciality=form.speciality.data,
+            address=form.address.data
         )
         user.set_password(form.password.data)
         db_sess.add(user)

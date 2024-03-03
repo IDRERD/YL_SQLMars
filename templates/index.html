@@ -1,29 +1,32 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Записи в блоге</h1>
+<link rel="stylesheet" type="text/css" href="../static/css/index.css">
+<h1 style="text-align: center;">Предстоящие работы</h1>
 {% if current_user.is_authenticated %}
     <a href="jobs" class="btn btn-secondary">Добавить новость</a>
 {% endif %}
 {% for job in jobs%}
+{%if not job.ins_finished%}
 <div class="col-md6 border rounded">
-    <h2>{{job.job}}</h2>
-    <!--{% if current_user.is_authenticated and current_user == item.user %}
+    <h2>{{job.job.capitalize()}}</h2>
+    <!--% if current_user.is_authenticated and current_user == item.user %
     <div>
-        <a href="/news/{{ item.id }}" class="btn btn-warning">
+        <a href="/news/{ item.id }" class="btn btn-warning">
             Изменить
         </a>
-        <a href="/news_delete/{{ item.id }}" class="btn btn-danger">
+        <a href="/news_delete/{ item.id }" class="btn btn-danger">
             Удалить
         </a>
-    </div>-->
-{% endif %}
-    <div>
-        {{job.job}}
     </div>
-    <div>
-        <!--Автор - {{item.user.name}},--> Дата изменения - {{item.modified_date}}
+% endif %-->
+    <div class="tml">
+        Руководитель работой: {{team_leaders[loop.index0].surname}} {{team_leaders[loop.index0].name}}
+    </div>
+    <div class="tml">
+        Время работы: {{job.work_size}}
     </div>
 </div>
+{%endif%}
 {% endfor %}
 {% endblock %}

@@ -13,5 +13,5 @@ class RegisterForm(FlaskForm):
     position = StringField("Должность")
     speciality = StringField("Профессия")
     address = StringField("Адрес участника")
-    about = TextAreaField("Немного о себе")
+    # about = TextAreaField("Немного о себе")
     submit = SubmitField('Войти')
