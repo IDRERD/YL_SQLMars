@@ -9,6 +9,7 @@ from data.jobs import Jobs
 from flask import render_template, url_for, redirect, request, make_response, abort, session
 from forms.user import RegisterForm
 from flask_login import LoginManager, login_required, logout_user, login_user, current_user
+from data.job_form import JobForm
 
 app = flask.Flask(__name__)
 app.config["SECRET_KEY"] = 'yandexlyceum_secret_key'
@@ -28,7 +29,7 @@ def main():
 def index():
     dbs = db_session.create_session()
     jobs = dbs.query(Jobs).all()
-    team_leaders = dbs.query(User).filter(User.id.in_([job.team_leader for job in dbs.query(Jobs).all()]))
+    team_leaders = [dbs.query(User).get(job.team_leader) for job in jobs]
     if not jobs or not len(jobs):
         return "Jobs not found"
     #if current_user.is_authenticated:
@@ -139,6 +140,26 @@ def add_news():
         return redirect('/')
     return render_template('news.html', title='Добавление новости',
                            form=form)
+
+
+@app.route("/add_job", methods=["POST", "GET"])
+@login_required
+def add_job():
+    form = JobForm()
+    if form.validate_on_submit():
+        dbs = db_session.create_session()
+        job = Jobs()
+        job.job = form.job.data
+        job.team_leader = form.team_leader.data
+        job.work_size = form.work_size.data
+        job.collaborators = form.collaborators.data
+        job.is_finished = form.is_finished.data
+        # job.start_date = form.start_date.data
+        # job.end_date = form.end_date.data
+        dbs.add(job)
+        dbs.commit()
+        return redirect("/")
+    return render_template("add_job.html", title="Добавление работы", form=form)
 
 
 @app.route('/news/<int:id>', methods=['GET', 'POST'])
