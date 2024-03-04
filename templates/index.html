@@ -11,12 +11,14 @@
 <div class="col-md6 border rounded">
     <h2>{{job.job.capitalize()}}</h2>
     <div>
+        {%if flags[loop.index0]%}
         <a href="/jobs/{{ job.id }}" class="btn btn-warning">
             Изменить
         </a>
-        <!--<a href="/news_delete/{ item.id }" class="btn btn-danger">
+        <a href="/delete_job/{{ job.id }}" class="btn btn-danger">
             Удалить
-        </a>-->
+        </a>
+        {%endif%}
     </div>
     <div class="tml">
         Руководитель работой: {{team_leaders[loop.index0].surname}} {{team_leaders[loop.index0].name}}

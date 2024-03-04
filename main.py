@@ -8,7 +8,7 @@ from data.jobs import Jobs
 #from data.news import News
 from flask import render_template, url_for, redirect, request, make_response, abort, session
 from forms.user import RegisterForm
-from flask_login import LoginManager, login_required, logout_user, login_user, current_user
+from flask_login import LoginManager, login_required, logout_user, login_user, current_user, AnonymousUserMixin
 from data.job_form import JobForm
 
 app = flask.Flask(__name__)
@@ -27,9 +27,12 @@ def main():
 @app.route("/")
 @app.route("/index")
 def index():
+    if isinstance(current_user, AnonymousUserMixin):
+        current_user.id = -1
     dbs = db_session.create_session()
     jobs = dbs.query(Jobs).all()
     team_leaders = [dbs.query(User).get(job.team_leader) for job in jobs]
+    flags = [current_user.id == 1 or current_user.id == job.creator for job in jobs]
     # if not jobs or not len(jobs):
     #     return "Jobs not found"
     #if current_user.is_authenticated:
@@ -37,7 +40,7 @@ def index():
     #        (News.user == current_user) | (News.is_private != True))
     #else:
     #    news = db_sess.query(News).filter(News.is_private != True)
-    return render_template("index.html", jobs=jobs, team_leaders=team_leaders)
+    return render_template("index.html", jobs=jobs, team_leaders=team_leaders, flags=flags)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -244,6 +247,19 @@ def news_delete(id):
     else:
         abort(404)
     return redirect('/')
+
+
+@app.route("/delete_job/<int:job_id>", methods=["GET", "POST"])
+@login_required
+def delete_job(job_id):
+    dbs = db_session.create_session()
+    job = dbs.query(Jobs).filter(Jobs.id == job_id).first()
+    if job and (current_user.id == job.creator or current_user.id == 1):
+        dbs.delete(job)
+        dbs.commit()
+    else:
+        abort(404)
+    return redirect("/")
 
 
 @app.errorhandler(404)
