@@ -1,15 +1,14 @@
-import datetime
-from data.login import LoginForm
-from data.news_form import NewsForm
+from forms.login import LoginForm
+from forms.news_form import NewsForm
 import flask
 from data import db_session
 from data.users import User
 from data.jobs import Jobs
 #from data.news import News
-from flask import render_template, url_for, redirect, request, make_response, abort, session
+from flask import render_template, redirect, request, make_response, abort, session
 from forms.user import RegisterForm
 from flask_login import LoginManager, login_required, logout_user, login_user, current_user, AnonymousUserMixin
-from data.job_form import JobForm
+from forms.job_form import JobForm
 
 app = flask.Flask(__name__)
 app.config["SECRET_KEY"] = 'yandexlyceum_secret_key'
