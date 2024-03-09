@@ -1,5 +1,5 @@
 from forms.login import LoginForm
-from forms.news_form import NewsForm
+# from forms.news_form import NewsForm
 import flask
 from data import db_session
 from data.users import User
