@@ -40,3 +40,14 @@ def add_job():
     dbs.add(job)
     dbs.commit()
     return flask.jsonify({"id": job.id})
+
+
+@blueprint.route("/api/jobs/<int:job_id>", methods=["DELETE"])
+def delete_job(job_id):
+    dbs = db_session.create_session()
+    job = dbs.query(Jobs).get(job_id)
+    if not job:
+        return flask.make_response(flask.jsonify({"error": "Not Found"}), 404)
+    dbs.delete(job)
+    dbs.commit()
+    return flask.jsonify({"success": "OK"})
