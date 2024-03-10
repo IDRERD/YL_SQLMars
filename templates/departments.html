@@ -1,0 +1,24 @@
+{%extends "base.html"%}
+{%block content%}
+<link rel="stylesheet" type="text/css" href="../static/css/departments.css">
+<h1 style="text-align: center;">List of Departments</h1>
+<a href="index" class="btn btn-secondary">Back to Jobs</a>
+<a href="add_department" class="btn btn-secondary">Add a Department</a>
+{%for department in departments%}
+<h2>Department #{{loop.index}}</h2>
+<table style="width: 100%;">
+	<tr>
+		<th>Title of department</th>
+		<th>Chief</th>
+		<th>Members</th>
+		<th>Department email</th>
+	</tr>
+	<tr style="height: 48pt;">
+		<td>{{department.title.capitalize()}}</td>
+		<td>{{cfs[loop.index0].surname}} {{cfs[loop.index0].name}}</td>
+		<td>{{department.members}}</td>
+		<td>{{department.email}}</td>
+	</tr>
+</table>
+{%endfor%}
+{%endblock%}
