@@ -51,3 +51,28 @@ def delete_job(job_id):
     dbs.delete(job)
     dbs.commit()
     return flask.jsonify({"success": "OK"})
+
+
+@blueprint.route("/api/jobs/<int:job_id>", methods=["POST"])
+def edit_job(job_id):
+    dbs = db_session.create_session()
+    job = dbs.query(Jobs).get(job_id)
+    if not job:
+        return flask.make_response(flask.jsonify({"error": "Not Found"}), 404)
+    for key in flask.request.json.keys():
+        if key == "team_leader":
+            job.team_leader = flask.request.json[key]
+        if key == "job":
+            job.job = flask.request.json[key]
+        if key == "work_size":
+            job.work_size = flask.request.json[key]
+        if key == "collaborators":
+            job.collaborators = flask.request.json[key]
+        if key == "start_date":
+            job.start_date = flask.request.json[key]
+        if key == "end_date":
+            job.end_date = flask.request.json[key]
+        if key == "is_finished":
+            job.is_finished = flask.request.json[key]
+    dbs.commit()
+    return flask.jsonify({"success": "OK"})
