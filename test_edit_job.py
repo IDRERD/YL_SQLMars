@@ -6,7 +6,7 @@ print("-------------------------")
 
 print(post("http://localhost:5000/api/jobs/4", json={
     'team_leader': 1,
-    'job': 'Edited job1',
+    'job': 'Edited job 2',
     'work_size': 24,
     'collaborators': '1, 2',
     # 'start_date': datetime.datetime.now(),
