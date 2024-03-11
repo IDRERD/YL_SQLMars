@@ -25,7 +25,7 @@ class UsersResource(fr.Resource):
         abort_if_not_found(user_id)
         session = db_session.create_session()
         user = session.query(User).get(user_id)
-        return flask.jsonify({"user": user.to_dict(only=("surname", "name", "age", "email", "position", "speciality"))})
+        return flask.jsonify({"user": user.to_dict(only=("surname", "name", "age", "email", "position", "speciality", "id"))})
 
     def delete(self, user_id):
         abort_if_not_found(user_id)
@@ -40,10 +40,12 @@ class UsersListResource(fr.Resource):
     def get(self):
         dbs = db_session.create_session()
         users = dbs.query(User).all()
-        return flask.jsonify({"users": [user.to_dict(only=("surname", "name", "age", "position", "speciality", "address", "email")) for user in users]})
+        return flask.jsonify({"users": [user.to_dict(only=("surname", "name", "age", "position", "speciality", "address", "email", "id")) for user in users]})
 
     def post(self):
         args = parser.parse_args()
+        if not len(args.keys()) or any(key not in ["surname", "name", "age", "position", "speciality", "address", "email"]):
+            return flask.male_response(flask.jsonify({"error": "Bad Request"}), 400)
         dbs = db_session.create_session()
         user = User(
             surname=args["surname"],
@@ -54,6 +56,7 @@ class UsersListResource(fr.Resource):
             address=args["address"],
             email=args["email"]
         )
+        user.set_password(args["password"])
         dbs.add(user)
         dbs.commit()
         return flask.jsonify({"id": user.id})
