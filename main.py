@@ -2,7 +2,7 @@ import flask_restful
 
 from forms.login import LoginForm
 import flask
-from data import db_session, users_resource
+from data import db_session, users_resource, jobs_resource
 from data.users import User
 from data.jobs import Jobs
 from flask import render_template, redirect, request, make_response, abort, session
@@ -24,6 +24,8 @@ def main():
     db_session.global_init("db/mars.db")
     api.add_resource(users_resource.UsersResource, "/api/v2/users/<int:user_id>")
     api.add_resource(users_resource.UsersListResource, "/api/v2/users")
+    api.add_resource(jobs_resource.JobsResource, "/api/v2/jobs/<int:job_id>")
+    api.add_resource(jobs_resource.JobsListResource, "/api/v2/jobs")
     app.register_blueprint(jobs_api.blueprint)
     app.run()
 
