@@ -6,57 +6,57 @@ from data import db_session
 from data.jobs import Jobs
 
 parser = reqparse.RequestParser()
-parser.add_argument('title', required=True)
-parser.add_argument('content', required=True)
-parser.add_argument('is_private', required=True, type=bool)
-parser.add_argument('is_published', required=True, type=bool)
-parser.add_argument('user_id', required=True, type=int)
+parser.add_argument('team_leader', required=True)
+parser.add_argument('job', required=True)
+parser.add_argument('work_size', required=True, type=int)
+parser.add_argument('is_finished', required=True, type=bool)
+parser.add_argument('collaborators', required=True)
+parser.add_argument('start_date', required=False)
+parser.add_argument('end_date', required=False)
 
 
-def abort_if_not_found(user_id):
+def abort_if_not_found(job_id):
     session = db_session.create_session()
-    user = session.query(User).get(user_id)
-    if not user:
-        fr.abort(404, message=f"User {user_id} not found")
+    job = session.query(Jobs).get(job_id)
+    if not job:
+        fr.abort(404, message=f"Job {job_id} not found")
 
 
-class UsersResource(fr.Resource):
-    def get(self, user_id):
-        abort_if_not_found(user_id)
+class JobsResource(fr.Resource):
+    def get(self, job_id):
+        abort_if_not_found(job_id)
         session = db_session.create_session()
-        user = session.query(User).get(user_id)
-        return flask.jsonify({"user": user.to_dict(only=("surname", "name", "age", "email", "position", "speciality", "id"))})
+        job = session.query(Jobs).get(job_id)
+        return flask.jsonify({"job": job.to_dict()})
 
-    def delete(self, user_id):
-        abort_if_not_found(user_id)
+    def delete(self, job_id):
+        abort_if_not_found(job_id)
         session = db_session.create_session()
-        user = session.query(User).get(user_id)
-        session.delete(user)
+        job = session.query(Jobs).get(job_id)
+        session.delete(job)
         session.commit()
         return flask.jsonify({"success": "OK"})
 
 
-class UsersListResource(fr.Resource):
+class JobsListResource(fr.Resource):
     def get(self):
         dbs = db_session.create_session()
-        users = dbs.query(User).all()
-        return flask.jsonify({"users": [user.to_dict(only=("surname", "name", "age", "position", "speciality", "address", "email", "id")) for user in users]})
+        jobs = dbs.query(Jobs).all()
+        return flask.jsonify({"jobs": [job.to_dict() for job in jobs]})
 
     def post(self):
         args = parser.parse_args()
-        if not len(args.keys()) or any(key not in ["surname", "name", "age", "position", "speciality", "address", "email"]):
+        if not len(args.keys()):
             return flask.male_response(flask.jsonify({"error": "Bad Request"}), 400)
         dbs = db_session.create_session()
-        user = User(
-            surname=args["surname"],
-            name=args["name"],
-            age=args["age"],
-            position=args["position"],
-            speciality=args["speciality"],
-            address=args["address"],
-            email=args["email"]
+        job = Jobs(
+            team_leader=args["team_leader"],
+            job=args["job"],
+            work_size=args["work_size"],
+            collaborators=args["collaborators"],
+            is_finished=args["speciality"]
         )
-        user.set_password(args["password"])
-        dbs.add(user)
+        job.set_password(args["password"])
+        dbs.add(job)
         dbs.commit()
-        return flask.jsonify({"id": user.id})
+        return flask.jsonify({"id": job.id})
