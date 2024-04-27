@@ -47,7 +47,7 @@ class UsersListResource(fr.Resource):
     def post(self):
         args = parser.parse_args()
         if not len(args.keys()) or any(key not in ["surname", "name", "age", "position", "speciality", "address", "email"]):
-            return flask.male_response(flask.jsonify({"error": "Bad Request"}), 400)
+            return flask.make_response(flask.jsonify({"error": "Bad Request"}), 400)
         dbs = db_session.create_session()
         user = User(
             surname=args["surname"],
